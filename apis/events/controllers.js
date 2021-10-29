@@ -3,7 +3,6 @@ const Event = require('../../db/models/Event')
 
 const getEventsList = async (req, res, next) => {
     const dateKey = req.body.startDate
-    console.log(dateKey)
     try {
         if (!dateKey) {
             const allEvents = await Event.find().select(
@@ -26,7 +25,6 @@ const getEventsList = async (req, res, next) => {
         next(err)
     }
 }
-//
 
 const getEventById = async (req, res, next) => {
     const { eventId } = req.params;
@@ -139,6 +137,47 @@ const getByName = async (req, res, next) => {
 	}
 }
 
+const getPagination = async (req, res, next) => {
+    try {
+        const page = parseInt(req.params.page)
+        const limit = parseInt(req.params.limit)
+        
+        const startIndex = (page - 1) * limit
+        const endIndex = page * limit
+    
+        const results = {}
+    
+        const numOfDocs = await Event.countDocuments()
+    
+        if (endIndex < numOfDocs) {
+            results.next = {
+                page: page + 1,
+                limit: limit
+            }
+        }
+        
+        if (startIndex > 0) {
+            results.previous = {
+                page: page - 1,
+                limit: limit
+            }
+        }
+        results.events = await Event.find().limit(limit).skip(startIndex).exec()
+        if (results.events.length >= 1) {
+            res.status(200).json(results)
+            
+        } else {
+            next({
+                status: 404,
+                message: "Error in the page number and limit!"
+            })
+        }
+
+    } catch (err) {
+        next(err)
+    }
+}
+
 module.exports = {
     getEventsList,
     getEventById,
@@ -146,5 +185,6 @@ module.exports = {
     updateEventItem,
     deleteEventItem,
     getFullyBooked,
-    getByName
+    getByName,
+    getPagination
 }

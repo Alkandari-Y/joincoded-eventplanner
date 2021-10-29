@@ -7,8 +7,11 @@ const {
     updateEventItem,
     deleteEventItem,
     getFullyBooked,
-    getByName
+    getByName,
+    getPagination
 } = require('./controllers')
+
+router.get("/paginate-list/:page&:limit", getPagination)
 
 router.get("/eventName/:eventName", getByName)
 
