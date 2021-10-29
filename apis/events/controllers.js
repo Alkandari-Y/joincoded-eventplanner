@@ -123,7 +123,6 @@ const getByName = async (req, res, next) => {
     try {
         const { eventName } = req.params;
         const foundNames = await Event.find({ name: eventName });
-        console.log(foundNames)
         if (foundNames.length === 0) {
             next({
                 status: 404,
@@ -162,17 +161,15 @@ const getPagination = async (req, res, next) => {
                 limit: limit
             }
         }
-        results.events = await Event.find().limit(limit).skip(startIndex).exec()
+        results.events = await Event.find().limit(limit).skip(startIndex)
         if (results.events.length >= 1) {
             res.status(200).json(results)
-            
         } else {
             next({
                 status: 404,
                 message: "Error in the page number and limit!"
             })
         }
-
     } catch (err) {
         next(err)
     }
