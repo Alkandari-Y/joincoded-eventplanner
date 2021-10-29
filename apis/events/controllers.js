@@ -6,10 +6,13 @@ const getEventsList = async (req, res, next) => {
     console.log(dateKey)
     try {
         if (!dateKey) {
-            const allEvents = await Event.find()
+            const allEvents = await Event.find().select(
+                ['_id', 'name', 'startDate']).sort('startDate').sort('name')
             return res.json(allEvents)
         } else if (dateKey){
-            const allEventsAfter = await Event.find({ startDate: { $gte: req.body.startDate } })
+            const allEventsAfter = await Event.find(
+                { startDate: { $gte: req.body.startDate } }
+            ).select(['_id', 'name', 'startDate']).sort('startDate').sort('name')
             if (allEventsAfter.length === 0) {
                 next({
                     status: 404,
